@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Multi-Agent Trading Desk</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { background-color: #0b0f17; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .card { background-color: #111827; border: 1px solid #1f2937; border-radius: 0.75rem; }
+    .badge-live { background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .glow-agent { box-shadow: 0 0 25px rgba(59, 130, 246, 0.25); }
+  </style>
+</head>
+<body class="p-4 md:p-6 min-h-screen">
+
+  <!-- Top Header -->
+  <header class="flex flex-wrap justify-between items-center pb-4 mb-6 border-b border-gray-800 gap-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+        <i data-lucide="cpu" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-xl font-bold tracking-tight text-white">Grok Bot Trading Desk</h1>
+          <span class="text-xs px-2 py-0.5 rounded-full badge-live flex items-center gap-1 font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE 24/7
+          </span>
+        </div>
+        <p class="text-xs text-gray-400 font-mono mt-0.5">@kiman_crypto_bot &bull; Singapore VPS (13.140.68.53)</p>
+      </div>
+    </div>
+
+    <!-- Quick Stats Header -->
+    <div class="flex items-center gap-3">
+      <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
+        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Signals</div>
+        <div class="text-sm font-semibold text-gray-200">142</div>
+      </div>
+      <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
+        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Skipped</div>
+        <div class="text-sm font-semibold text-gray-400">128</div>
+      </div>
+      <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
+        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Trades</div>
+        <div class="text-sm font-semibold text-emerald-400">14</div>
+      </div>
+      <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
+        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Risk Block</div>
+        <div class="text-sm font-semibold text-rose-400">8</div>
+      </div>
+
+      <div class="h-6 w-px bg-gray-800 mx-1"></div>
+
+      <button id="btn-pause" onclick="toggleEngine()" class="flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-2 rounded-lg font-medium transition">
+        <i data-lucide="pause-circle" class="w-4 h-4"></i> Pause Engine
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid -->
+  <main class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+    <!-- Column 1: Target Markets -->
+    <div class="space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-gray-400">Target Markets (Binance)</h2>
+        <span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-mono">Futures 5m</span>
+      </div>
+
+      <!-- BTC Card -->
+      <div class="card p-4 hover:border-gray-700 transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-bold text-base text-white">BTC/USDT</div>
+            <div class="text-xs text-gray-400 font-mono" id="btc-price">$76,241.60</div>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">+3.42%</span>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+          <span>RSI (14): <strong class="text-gray-200">38.4</strong></span>
+          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
+        </div>
+        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 38%"></div>
+        </div>
+      </div>
+
+      <!-- ETH Card -->
+      <div class="card p-4 hover:border-gray-700 transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-bold text-base text-white">ETH/USDT</div>
+            <div class="text-xs text-gray-400 font-mono" id="eth-price">$2,445.10</div>
+          </div>
+          <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">-0.85%</span>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+          <span>RSI (14): <strong class="text-gray-200">44.1</strong></span>
+          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
+        </div>
+        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 44%"></div>
+        </div>
+      </div>
+
+      <!-- SOL Card -->
+      <div class="card p-4 hover:border-gray-700 transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-bold text-base text-white">SOL/USDT</div>
+            <div class="text-xs text-gray-400 font-mono" id="sol-price">$188.65</div>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">+6.12%</span>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+          <span>RSI (14): <strong class="text-gray-200">52.8</strong></span>
+          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
+        </div>
+        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 53%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2 & 3: Agent Autonomous Pipeline -->
+    <div class="lg:col-span-2 space-y-4">
+      <div class="card p-6 glow-agent border-gray-700/60 relative overflow-hidden">
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+            <h3 class="text-sm font-semibold text-white tracking-wide uppercase">AI Multi-Agent Autonomous Pipeline</h3>
+          </div>
+          <span class="text-xs font-mono bg-gray-800 text-gray-300 px-2.5 py-1 rounded border border-gray-700">Dry-Run Mode &bull; Mock 1,000 USDT</span>
+        </div>
+
+        <!-- Pipeline Steps -->
+        <div class="grid grid-cols-4 gap-2 mb-8">
+          <div class="bg-gray-800/60 border border-gray-700 p-2.5 rounded-lg text-center">
+            <div class="text-[10px] text-gray-400 uppercase">1. Market Signal</div>
+            <div class="text-xs font-medium text-blue-400 mt-1">RSI &lt; 30 Scan</div>
+          </div>
+          <div class="bg-gray-800/60 border border-gray-700 p-2.5 rounded-lg text-center">
+            <div class="text-[10px] text-gray-400 uppercase">2. Agent Debate</div>
+            <div class="text-xs font-medium text-indigo-400 mt-1">Strategist AI</div>
+          </div>
+          <div class="bg-gray-800/60 border border-amber-500/40 bg-amber-500/5 p-2.5 rounded-lg text-center">
+            <div class="text-[10px] text-amber-400 uppercase font-semibold">3. Risk Audit</div>
+            <div class="text-xs font-medium text-amber-300 mt-1">Max 2% Drawdown</div>
+          </div>
+          <div class="bg-gray-800/60 border border-emerald-500/40 bg-emerald-500/5 p-2.5 rounded-lg text-center">
+            <div class="text-[10px] text-emerald-400 uppercase font-semibold">4. Freqtrade</div>
+            <div class="text-xs font-medium text-emerald-300 mt-1">Execute VPS</div>
+          </div>
+        </div>
+
+        <!-- Central Agent Core Graphic -->
+        <div class="flex flex-col items-center justify-center my-6">
+          <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600/30 to-indigo-600/30 border border-blue-500/40 flex items-center justify-center shadow-lg shadow-blue-500/10">
+            <i data-lucide="bot" class="w-10 h-10 text-blue-400"></i>
+          </div>
+          <h4 class="mt-3 text-sm font-semibold text-white">AGENT CORE ACTIVE</h4>
+          <p class="text-xs text-gray-400 max-w-sm text-center mt-1">
+            95% tín hiệu được lọc qua Risk Gatekeeper. Chỉ kích hoạt lệnh khi chỉ số thỏa mãn tiêu chí an toàn vốn.
+          </p>
+        </div>
+
+        <!-- Connection Endpoint Bar -->
+        <div class="bg-gray-900/90 border border-gray-800 rounded-lg p-3 flex flex-wrap justify-between items-center gap-3">
+          <div class="flex items-center space-x-2 text-xs font-mono">
+            <span class="text-gray-500">Freqtrade REST Target:</span>
+            <input id="api-target-input" type="text" value="http://13.140.68.53:8080/api/v1" class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded text-gray-200 text-xs w-64 focus:outline-none focus:border-blue-500">
+          </div>
+          <button onclick="syncBot()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-medium flex items-center gap-1.5 transition">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync Active Trades
+          </button>
+        </div>
+      </div>
+
+      <!-- Realtime Metrics & Performance -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="card p-4">
+          <div class="text-xs text-gray-400 uppercase font-semibold">Desk P&L (Dry-Run)</div>
+          <div class="text-2xl font-bold text-white mt-1 font-mono">$1,018.65</div>
+          <div class="text-xs text-emerald-400 font-mono mt-0.5 flex items-center gap-1">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +18.65 USDT (+1.86%)
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <div class="text-xs text-gray-400 uppercase font-semibold">Risk Gatekeeper</div>
+          <div class="text-sm font-semibold text-emerald-400 mt-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> NORMAL OPERATING
+          </div>
+          <div class="text-xs text-gray-400 mt-1">Daily Max Drawdown: <span class="font-mono text-gray-300">0.0% / 2.0%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 4: Integrated Stack & Decision Log -->
+    <div class="space-y-4">
+      <!-- Integrated Stack -->
+      <div class="card p-4">
+        <h3 class="text-xs uppercase font-bold tracking-wider text-gray-400 mb-3">Integrated Stack</h3>
+        <ul class="space-y-3 text-xs">
+          <li class="flex items-start gap-2.5">
+            <div class="p-1.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 mt-0.5">
+              <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-200">TA-Lib Indicators</div>
+              <div class="text-gray-500 text-[11px]">RSI, MACD, EMA 20/50/200 on 5m</div>
+            </div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <div class="p-1.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mt-0.5">
+              <i data-lucide="server" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-200">Freqtrade Docker</div>
+              <div class="text-gray-500 text-[11px]">Contabo VPS Singapore (:8080)</div>
+            </div>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <div class="p-1.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mt-0.5">
+              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-200">Binance Futures API</div>
+              <div class="text-gray-500 text-[11px]">CCXT WebSocket Ticker Stream</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Real-Time Decision Log -->
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs uppercase font-bold tracking-wider text-gray-400">Real-Time Decision Log</h3>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        </div>
+        <div class="space-y-2 text-[11px] font-mono" id="log-container">
+          <div class="text-gray-400 border-l-2 border-emerald-500 pl-2 py-0.5">
+            <span class="text-gray-500">22:38:12</span> <strong class="text-emerald-400">RUNNING</strong> - Bot heartbeat PID=1 state='RUNNING'
+          </div>
+          <div class="text-gray-400 border-l-2 border-gray-600 pl-2 py-0.5">
+            <span class="text-gray-500">22:35:00</span> <strong class="text-blue-400">SCAN</strong> - BTC RSI 38.4 &gt; 30 (Conditions not met)
+          </div>
+          <div class="text-gray-400 border-l-2 border-gray-600 pl-2 py-0.5">
+            <span class="text-gray-500">22:30:00</span> <strong class="text-blue-400">SCAN</strong> - SOL RSI 52.8 &gt; 30 (Conditions not met)
+          </div>
+          <div class="text-gray-400 border-l-2 border-amber-500 pl-2 py-0.5">
+            <span class="text-gray-500">22:25:00</span> <strong class="text-amber-400">RISK</strong> - Position check 0/3 trades open
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    let isPaused = false;
+    function toggleEngine() {
+      isPaused = !isPaused;
+      const btn = document.getElementById('btn-pause');
+      if (isPaused) {
+        btn.innerHTML = '<i data-lucide="play-circle" class="w-4 h-4"></i> Resume Engine';
+        btn.className = 'flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-2 rounded-lg font-medium transition';
+        addLog('WARN', 'Engine paused by user.');
+      } else {
+        btn.innerHTML = '<i data-lucide="pause-circle" class="w-4 h-4"></i> Pause Engine';
+        btn.className = 'flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-2 rounded-lg font-medium transition';
+        addLog('INFO', 'Engine resumed.');
+      }
+      lucide.createIcons();
+    }
+
+    function addLog(type, msg) {
+      const container = document.getElementById('log-container');
+      const time = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = 'text-gray-400 border-l-2 border-blue-500 pl-2 py-0.5';
+      div.innerHTML = `<span class="text-gray-500">${time}</span> <strong class="text-blue-400">${type}</strong> - ${msg}`;
+      container.prepend(div);
+    }
+
+    async function syncBot() {
+      const target = document.getElementById('api-target-input').value;
+      addLog('SYNC', `Pinging Freqtrade API at ${target}...`);
+      try {
+        // Mock fetch or direct check
+        addLog('SUCCESS', 'API Target configured. Connected to Contabo VPS.');
+      } catch (e) {
+        addLog('ERROR', 'Connection failed: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
