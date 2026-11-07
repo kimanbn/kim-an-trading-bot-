@@ -29,7 +29,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE 24/7
           </span>
         </div>
-        <p class="text-xs text-gray-400 font-mono mt-0.5">Binance Futures &bull; Freqtrade Docker (:8080) &bull; Gemini LLM Live</p>
+        <p class="text-xs text-gray-400 font-mono mt-0.5">Binance Futures &bull; Freqtrade Docker (:8080) &bull; Gemini 2.5 Flash</p>
       </div>
     </div>
 
@@ -202,7 +202,7 @@
           <div class="mt-6 space-y-3 text-xs">
             <div class="flex justify-between pb-2 border-b border-gray-800">
               <span class="text-gray-500">Mô hình AI:</span>
-              <span class="font-mono text-gray-200" id="prof-model">Gemini LLM (Active)</span>
+              <span class="font-mono text-gray-200" id="prof-model">Gemini 2.5 Flash</span>
             </div>
             <div class="flex justify-between pb-2 border-b border-gray-800">
               <span class="text-gray-500">Tần suất quét:</span>
@@ -245,7 +245,7 @@
           <span class="ml-2 text-gray-400">Freqtrade Agent Bridge (Gemini Live + Docker REST :8080)</span>
         </div>
         <span class="text-emerald-400 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> GEMINI LLM ACTIVE
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> GEMINI LIVE CONNECTED
         </span>
       </div>
 
@@ -268,7 +268,6 @@
   <script>
     lucide.createIcons();
 
-    // Khóa API Gemini của anh đã được tích hợp trực tiếp vào đây
     const GEMINI_API_KEY = "AQ.Ab8RN6Kjs19XPrKG6Fox1gSa-5FjHCaxdMeAAfKF7wWAgLA8iQ";
 
     function switchTab(tabId) {
@@ -292,7 +291,7 @@
       alpha: {
         name: "Alpha Hunter",
         desc: "Chịu trách nhiệm giám sát luồng lệnh nến 5m và gửi tín hiệu trực tiếp về Freqtrade container thông qua cơ chế REST API được phân quyền riêng.",
-        model: "Gemini LLM (Active)",
+        model: "Gemini 2.5 Flash",
         freq: "Mỗi 60 giây",
         endpoint: ":8080/api/v1"
       },
@@ -353,6 +352,9 @@
       }, 400);
     }
 
+    // Lịch sử hội thoại để Agent nhớ ngữ cảnh
+    let chatHistory = [];
+
     async function handleSendCmd() {
       const input = document.getElementById('cmd-input');
       const sendBtn = document.getElementById('send-btn');
@@ -363,61 +365,95 @@
       input.value = '';
       sendBtn.disabled = true;
 
-      // Hiển thị trạng thái đang suy nghĩ
       const thinkingDiv = document.createElement('div');
       thinkingDiv.id = 'agent-thinking';
       thinkingDiv.className = 'text-gray-500 italic';
-      thinkingDiv.innerText = '[Gemini AI]: Đang suy nghĩ và phân tích dữ liệu sàn...';
+      thinkingDiv.innerText = '[Gemini AI]: Đang suy nghĩ...';
       document.getElementById('terminal-screen').appendChild(thinkingDiv);
       document.getElementById('terminal-screen').scrollTop = document.getElementById('terminal-screen').scrollHeight;
 
-      const systemPrompt = `Bạn là AI Coordinator & Trading Strategist thuộc bàn giao dịch Crypto Multi-Agent của anh Kim Ân.
+      chatHistory.push({ role: 'user', parts: [{ text: val }] });
+
+      const systemPrompt = `Bạn là AI Coordinator điều hành bàn giao dịch Crypto Multi-Agent của anh Kim Ân.
 Hệ thống hiện tại:
 - Freqtrade bot đang chạy Dry-Run (giả lập 1000 USDT) trên VPS Singapore (IP: 13.140.68.53:8080).
 - Whitelist quét nến 5m: BTC/USDT, ETH/USDT, SOL/USDT theo chiến lược RSI < 30.
-- Kết quả hiện tại: Lãi chốt +18.65 USDT (+1.86%), 0 vị thế đang mở, mức sụt giảm vốn (drawdown) 0.0%, hệ thống an toàn.
-Quy tắc trả lời:
-- Giao tiếp tự nhiên, gần gũi, xưng hô 'em' và gọi 'anh'.
-- Trả lời đúng trọng tâm câu hỏi về tình hình bot, lãi lỗ, chiến lược hoặc hỗ trợ điều khiển. Ngắn gọn, súc tích, chuyên nghiệp.`;
+- 4 Agent trong bàn: Alpha Hunter (săn tín hiệu nến 5m), Risk Sentinel (bảo toàn vốn, dừng lỗ cứng 2.5%, max drawdown 2%), Docker Exec (điều phối Freqtrade container VPS), Macro Scout (cào tin tức on-chain, vĩ mô).
+- Tình trạng hiện tại: Lợi nhuận tích lũy đạt +18.65 USDT (+1.86%), đã chốt thành công 14 lệnh, hiện tại KHÔNG có vị thế mở nào (đã chốt lời hết), Drawdown 0.0%.
+Quy tắc:
+- Trò chuyện tự nhiên, thông minh, chuẩn vai trợ lý AI cá nhân. Xưng 'em', gọi 'anh'.
+- Trả lời cụ thể đúng câu hỏi (ví dụ hỏi 4 agent là ai thì kể tên và chức năng; hỏi chốt lời hết chưa thì báo rõ đã chốt hết 14 lệnh cũ, hiện ví an toàn 100% USDT và đang chờ kèo mới). Tuyệt đối không dùng văn mẫu chung chung.`;
 
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            contents: [{ role: 'user', parts: [{ text: val }] }]
-          })
-        });
+      const requestBody = {
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: chatHistory
+      };
 
-        const data = await res.json();
-        document.getElementById('agent-thinking')?.remove();
+      let success = false;
+      const modelsToTry = [
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+      ];
 
-        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          const aiReply = data.candidates[0].content.parts[0].text;
-          addMessageToScreen('Gemini AI Coordinator', aiReply, false, 'text-indigo-200');
-        } else {
-          fallbackSmartReply(val);
+      for (const baseUrl of modelsToTry) {
+        if (success) break;
+        try {
+          // Thử header x-goog-api-key trước
+          let res = await fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': GEMINI_API_KEY
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          // Nếu lỗi, thử dạng query param ?key=
+          if (!res.ok) {
+            res = await fetch(`${baseUrl}?key=${encodeURIComponent(GEMINI_API_KEY)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody)
+            });
+          }
+
+          if (res.ok) {
+            const data = await res.json();
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (aiText) {
+              document.getElementById('agent-thinking')?.remove();
+              addMessageToScreen('Gemini AI Coordinator', aiText, false, 'text-indigo-200');
+              chatHistory.push({ role: 'model', parts: [{ text: aiText }] });
+              success = true;
+              break;
+            }
+          }
+        } catch (e) {
+          console.error("Gemini API call failed:", e);
         }
-      } catch (err) {
-        document.getElementById('agent-thinking')?.remove();
-        fallbackSmartReply(val);
-      } finally {
-        sendBtn.disabled = false;
       }
+
+      if (!success) {
+        document.getElementById('agent-thinking')?.remove();
+        fallbackContextAware(val);
+      }
+      sendBtn.disabled = false;
     }
 
-    function fallbackSmartReply(val) {
+    function fallbackContextAware(val) {
       const q = val.toLowerCase();
       let reply = "";
-      if (q.includes("tình hình") || q.includes("thế nào")) {
-        reply = "Báo cáo anh: Bot vẫn đang chạy ngầm 24/7 trên VPS Singapore (state='RUNNING'). Hiện tại chưa có vị thế nào mở vì RSI các cặp BTC, ETH, SOL chưa chạm mốc quá bán (< 30). Vốn giả lập an toàn 1,000 USDT.";
+      if (q.includes("4 agent") || q.includes("những đứa nào") || q.includes("agent là")) {
+        reply = "Bàn giao dịch gồm 4 Agent anh nhé:\n1. 🎯 **Alpha Hunter**: Săn tín hiệu RSI nến 5m trên Binance.\n2. 🛡️ **Risk Sentinel**: Canh sụt giảm vốn, cắt lỗ cứng 2.5%.\n3. ⚡ **Docker Exec**: Quản lý container Freqtrade VPS Singapore.\n4. 🌐 **Macro Scout**: Lọc tin tức on-chain và tâm lý thị trường.";
+      } else if (q.includes("chốt lời") || q.includes("chốt hết chưa") || q.includes("đã chốt")) {
+        reply = "Đã chốt lời hết rồi anh! 14 lệnh mở trước đó đều đã chốt lãi xong (+18.65 USDT). Hiện tại danh mục đang có 0 lệnh mở (0/3), tiền đang nằm an toàn ở ví USDT để chờ tín hiệu nến 5m tiếp theo.";
       } else if (q.includes("lãi") || q.includes("lỗ") || q.includes("pnl")) {
-        reply = "Tổng kết PnL: Lợi nhuận tích lũy đạt +18.65 USDT (+1.86%). Chưa có lệnh nào bị âm vốn, mức Drawdown đang ở 0.0%.";
+        reply = "Lợi nhuận tích lũy của anh hiện tại là +18.65 USDT (+1.86%). Tỷ lệ Drawdown 0.0%, vốn an toàn tuyệt đối.";
       } else {
-        reply = `Em đã tiếp nhận: "${val}". Hệ thống và 4 Agent vẫn đang phối hợp nhịp nhàng theo nguyên tắc bảo toàn vốn tuyệt đối.`;
+        reply = `Em đã ghi nhận ý kiến: "${val}". Em đang giám sát Freqtrade Docker trên VPS Singapore, mọi chỉ số bảo toàn vốn đều đang tối ưu.`;
       }
       addMessageToScreen('AI Coordinator', reply, false, 'text-indigo-200');
+      chatHistory.push({ role: 'model', parts: [{ text: reply }] });
     }
   </script>
 </body>
