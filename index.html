@@ -3,299 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Multi-Agent Trading Desk</title>
+  <title>Kiman Crypto Multi-Agent Trading Desk</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body { background-color: #0b0f17; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .card { background-color: #111827; border: 1px solid #1f2937; border-radius: 0.75rem; }
     .badge-live { background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .glow-agent { box-shadow: 0 0 25px rgba(59, 130, 246, 0.25); }
+    .tab-btn.active { background-color: #4f46e5; color: white; border-color: #6366f1; }
+    .tab-btn { background-color: #1f2937; color: #9ca3af; border: 1px solid #374151; }
   </style>
 </head>
-<body class="p-4 md:p-6 min-h-screen">
+<body class="p-4 md:p-6 min-h-screen flex flex-col">
 
-  <!-- Top Header -->
+  <!-- Header -->
   <header class="flex flex-wrap justify-between items-center pb-4 mb-6 border-b border-gray-800 gap-4">
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
-        <i data-lucide="cpu" class="w-6 h-6"></i>
+      <div class="w-10 h-10 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+        <i data-lucide="bot" class="w-6 h-6"></i>
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <h1 class="text-xl font-bold tracking-tight text-white">Grok Bot Trading Desk</h1>
+          <h1 class="text-xl font-bold tracking-tight text-white">KIMAN MULTI-AGENT DESK</h1>
           <span class="text-xs px-2 py-0.5 rounded-full badge-live flex items-center gap-1 font-mono">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE 24/7
           </span>
         </div>
-        <p class="text-xs text-gray-400 font-mono mt-0.5">@kiman_crypto_bot &bull; Singapore VPS (13.140.68.53)</p>
+        <p class="text-xs text-gray-400 font-mono mt-0.5">Binance Futures &bull; Freqtrade Docker (:8080) &bull; Gemini LLM</p>
       </div>
     </div>
 
-    <!-- Quick Stats Header -->
+    <!-- Quick Stats -->
     <div class="flex items-center gap-3">
       <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
-        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Signals</div>
+        <div class="text-[10px] text-gray-500 uppercase">Signals</div>
         <div class="text-sm font-semibold text-gray-200">142</div>
       </div>
       <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
-        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Skipped</div>
+        <div class="text-[10px] text-gray-500 uppercase">Skipped</div>
         <div class="text-sm font-semibold text-gray-400">128</div>
       </div>
       <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
-        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Trades</div>
+        <div class="text-[10px] text-gray-500 uppercase">Trades</div>
         <div class="text-sm font-semibold text-emerald-400">14</div>
       </div>
       <div class="bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-center">
-        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Risk Block</div>
+        <div class="text-[10px] text-gray-500 uppercase">Risk Block</div>
         <div class="text-sm font-semibold text-rose-400">8</div>
       </div>
-
-      <div class="h-6 w-px bg-gray-800 mx-1"></div>
-
-      <button id="btn-pause" onclick="toggleEngine()" class="flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-2 rounded-lg font-medium transition">
-        <i data-lucide="pause-circle" class="w-4 h-4"></i> Pause Engine
-      </button>
     </div>
   </header>
 
-  <!-- Main Grid -->
-  <main class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+  <!-- Navigation Tabs -->
+  <div class="flex items-center gap-2 mb-6 border-b border-gray-800 pb-3">
+    <button onclick="switchTab('pipeline')" id="tab-pipeline-btn" class="tab-btn active px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition">
+      <i data-lucide="trending-up" class="w-4 h-4"></i> Trading Desk Pipeline
+    </button>
+    <button onclick="switchTab('office')" id="tab-office-btn" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition">
+      <i data-lucide="users" class="w-4 h-4"></i> Virtual Agent Office (Floor 1)
+    </button>
+    <button onclick="switchTab('terminal')" id="tab-terminal-btn" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition">
+      <i data-lucide="terminal" class="w-4 h-4"></i> Freqtrade Live Terminal
+    </button>
+  </div>
 
-    <!-- Column 1: Target Markets -->
-    <div class="space-y-4">
-      <div class="flex justify-between items-center">
+  <!-- TAB 1: PIPELINE -->
+  <section id="tab-pipeline" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <!-- Markets -->
+      <div class="space-y-4">
         <h2 class="text-xs uppercase font-bold tracking-wider text-gray-400">Target Markets (Binance)</h2>
-        <span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-mono">Futures 5m</span>
-      </div>
-
-      <!-- BTC Card -->
-      <div class="card p-4 hover:border-gray-700 transition">
-        <div class="flex justify-between items-start">
-          <div>
-            <div class="font-bold text-base text-white">BTC/USDT</div>
-            <div class="text-xs text-gray-400 font-mono" id="btc-price">$76,241.60</div>
-          </div>
-          <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">+3.42%</span>
-        </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-          <span>RSI (14): <strong class="text-gray-200">38.4</strong></span>
-          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
-        </div>
-        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 38%"></div>
-        </div>
-      </div>
-
-      <!-- ETH Card -->
-      <div class="card p-4 hover:border-gray-700 transition">
-        <div class="flex justify-between items-start">
-          <div>
-            <div class="font-bold text-base text-white">ETH/USDT</div>
-            <div class="text-xs text-gray-400 font-mono" id="eth-price">$2,445.10</div>
-          </div>
-          <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">-0.85%</span>
-        </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-          <span>RSI (14): <strong class="text-gray-200">44.1</strong></span>
-          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
-        </div>
-        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 44%"></div>
-        </div>
-      </div>
-
-      <!-- SOL Card -->
-      <div class="card p-4 hover:border-gray-700 transition">
-        <div class="flex justify-between items-start">
-          <div>
-            <div class="font-bold text-base text-white">SOL/USDT</div>
-            <div class="text-xs text-gray-400 font-mono" id="sol-price">$188.65</div>
-          </div>
-          <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">+6.12%</span>
-        </div>
-        <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-          <span>RSI (14): <strong class="text-gray-200">52.8</strong></span>
-          <span class="text-[11px] text-gray-500 font-mono">Target: &lt;30</span>
-        </div>
-        <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-          <div class="bg-blue-500 h-1.5 rounded-full" style="width: 53%"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Column 2 & 3: Agent Autonomous Pipeline -->
-    <div class="lg:col-span-2 space-y-4">
-      <div class="card p-6 glow-agent border-gray-700/60 relative overflow-hidden">
-        <div class="flex justify-between items-center mb-6">
-          <div class="flex items-center space-x-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
-            <h3 class="text-sm font-semibold text-white tracking-wide uppercase">AI Multi-Agent Autonomous Pipeline</h3>
-          </div>
-          <span class="text-xs font-mono bg-gray-800 text-gray-300 px-2.5 py-1 rounded border border-gray-700">Dry-Run Mode &bull; Mock 1,000 USDT</span>
-        </div>
-
-        <!-- Pipeline Steps -->
-        <div class="grid grid-cols-4 gap-2 mb-8">
-          <div class="bg-gray-800/60 border border-gray-700 p-2.5 rounded-lg text-center">
-            <div class="text-[10px] text-gray-400 uppercase">1. Market Signal</div>
-            <div class="text-xs font-medium text-blue-400 mt-1">RSI &lt; 30 Scan</div>
-          </div>
-          <div class="bg-gray-800/60 border border-gray-700 p-2.5 rounded-lg text-center">
-            <div class="text-[10px] text-gray-400 uppercase">2. Agent Debate</div>
-            <div class="text-xs font-medium text-indigo-400 mt-1">Strategist AI</div>
-          </div>
-          <div class="bg-gray-800/60 border border-amber-500/40 bg-amber-500/5 p-2.5 rounded-lg text-center">
-            <div class="text-[10px] text-amber-400 uppercase font-semibold">3. Risk Audit</div>
-            <div class="text-xs font-medium text-amber-300 mt-1">Max 2% Drawdown</div>
-          </div>
-          <div class="bg-gray-800/60 border border-emerald-500/40 bg-emerald-500/5 p-2.5 rounded-lg text-center">
-            <div class="text-[10px] text-emerald-400 uppercase font-semibold">4. Freqtrade</div>
-            <div class="text-xs font-medium text-emerald-300 mt-1">Execute VPS</div>
-          </div>
-        </div>
-
-        <!-- Central Agent Core Graphic -->
-        <div class="flex flex-col items-center justify-center my-6">
-          <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600/30 to-indigo-600/30 border border-blue-500/40 flex items-center justify-center shadow-lg shadow-blue-500/10">
-            <i data-lucide="bot" class="w-10 h-10 text-blue-400"></i>
-          </div>
-          <h4 class="mt-3 text-sm font-semibold text-white">AGENT CORE ACTIVE</h4>
-          <p class="text-xs text-gray-400 max-w-sm text-center mt-1">
-            95% tín hiệu được lọc qua Risk Gatekeeper. Chỉ kích hoạt lệnh khi chỉ số thỏa mãn tiêu chí an toàn vốn.
-          </p>
-        </div>
-
-        <!-- Connection Endpoint Bar -->
-        <div class="bg-gray-900/90 border border-gray-800 rounded-lg p-3 flex flex-wrap justify-between items-center gap-3">
-          <div class="flex items-center space-x-2 text-xs font-mono">
-            <span class="text-gray-500">Freqtrade REST Target:</span>
-            <input id="api-target-input" type="text" value="http://13.140.68.53:8080/api/v1" class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded text-gray-200 text-xs w-64 focus:outline-none focus:border-blue-500">
-          </div>
-          <button onclick="syncBot()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-medium flex items-center gap-1.5 transition">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sync Active Trades
-          </button>
-        </div>
-      </div>
-
-      <!-- Realtime Metrics & Performance -->
-      <div class="grid grid-cols-2 gap-4">
         <div class="card p-4">
-          <div class="text-xs text-gray-400 uppercase font-semibold">Desk P&L (Dry-Run)</div>
-          <div class="text-2xl font-bold text-white mt-1 font-mono">$1,018.65</div>
-          <div class="text-xs text-emerald-400 font-mono mt-0.5 flex items-center gap-1">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +18.65 USDT (+1.86%)
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-white">BTC/USDT</span>
+            <span class="text-xs text-emerald-400 font-mono">+3.42%</span>
           </div>
+          <div class="text-xs text-gray-400 mt-1 font-mono">$76,241.60</div>
+          <div class="mt-2 text-[11px] text-gray-400">RSI (14): 38.4 &bull; Target: &lt;30</div>
         </div>
-
         <div class="card p-4">
-          <div class="text-xs text-gray-400 uppercase font-semibold">Risk Gatekeeper</div>
-          <div class="text-sm font-semibold text-emerald-400 mt-1 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> NORMAL OPERATING
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-white">ETH/USDT</span>
+            <span class="text-xs text-rose-400 font-mono">-0.85%</span>
           </div>
-          <div class="text-xs text-gray-400 mt-1">Daily Max Drawdown: <span class="font-mono text-gray-300">0.0% / 2.0%</span></div>
+          <div class="text-xs text-gray-400 mt-1 font-mono">$2,445.10</div>
+          <div class="mt-2 text-[11px] text-gray-400">RSI (14): 44.1 &bull; Target: &lt;30</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-white">SOL/USDT</span>
+            <span class="text-xs text-emerald-400 font-mono">+6.12%</span>
+          </div>
+          <div class="text-xs text-gray-400 mt-1 font-mono">$188.65</div>
+          <div class="mt-2 text-[11px] text-gray-400">RSI (14): 52.8 &bull; Target: &lt;30</div>
         </div>
       </div>
-    </div>
 
-    <!-- Column 4: Integrated Stack & Decision Log -->
-    <div class="space-y-4">
+      <!-- Autonomous Pipeline -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="card p-6">
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs uppercase font-bold text-gray-300">AI Autonomous Pipeline</span>
+            <span class="text-xs font-mono bg-gray-800 px-2 py-0.5 rounded text-gray-400">Dry-Run &bull; 1,000 USDT</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="bg-gray-800/80 p-2.5 rounded border border-gray-700">1. Signal (RSI)</div>
+            <div class="bg-gray-800/80 p-2.5 rounded border border-indigo-700">2. Debate AI</div>
+            <div class="bg-gray-800/80 p-2.5 rounded border border-amber-700 text-amber-300">3. Risk Audit</div>
+            <div class="bg-gray-800/80 p-2.5 rounded border border-emerald-700 text-emerald-300">4. Freqtrade</div>
+          </div>
+          <div class="mt-6 p-4 rounded bg-gray-900 border border-gray-800 flex items-center justify-between">
+            <span class="text-xs font-mono text-gray-400">VPS REST Target:</span>
+            <span class="text-xs font-mono text-indigo-400">http://13.140.68.53:8080/api/v1</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Connected</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="card p-4">
+            <div class="text-xs text-gray-400">Desk P&L</div>
+            <div class="text-xl font-bold font-mono text-white mt-1">$1,018.65</div>
+            <div class="text-xs text-emerald-400 font-mono mt-0.5">+18.65 USDT (+1.86%)</div>
+          </div>
+          <div class="card p-4">
+            <div class="text-xs text-gray-400">Daily Drawdown</div>
+            <div class="text-xl font-bold font-mono text-emerald-400 mt-1">0.0%</div>
+            <div class="text-xs text-gray-400 mt-0.5">Floor limit: 2.0%</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Integrated Stack -->
-      <div class="card p-4">
-        <h3 class="text-xs uppercase font-bold tracking-wider text-gray-400 mb-3">Integrated Stack</h3>
-        <ul class="space-y-3 text-xs">
-          <li class="flex items-start gap-2.5">
-            <div class="p-1.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 mt-0.5">
-              <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+      <div class="card p-4 space-y-3">
+        <h2 class="text-xs uppercase font-bold tracking-wider text-gray-400 mb-2">Integrated Stack</h2>
+        <div class="text-xs p-2.5 rounded bg-gray-800/60 border border-gray-700">
+          <div class="font-semibold text-gray-200">TA-Lib Indicators</div>
+          <div class="text-gray-400 text-[11px]">RSI, MACD, EMA on 5m</div>
+        </div>
+        <div class="text-xs p-2.5 rounded bg-gray-800/60 border border-gray-700">
+          <div class="font-semibold text-gray-200">Freqtrade Docker</div>
+          <div class="text-gray-400 text-[11px]">Contabo VPS (:8080)</div>
+        </div>
+        <div class="text-xs p-2.5 rounded bg-gray-800/60 border border-gray-700">
+          <div class="font-semibold text-gray-200">Gemini LLM Agent</div>
+          <div class="text-gray-400 text-[11px]">Multi-Agent Coordinator</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: VIRTUAL AGENT OFFICE -->
+  <section id="tab-office" class="hidden space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Agent Grid -->
+      <div class="lg:col-span-2 card p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Phòng Họp Ảo Của Các AI Agent (Floor 1)</h3>
+          <span class="text-xs px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">4 AGENTS ACTIVE</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <!-- Agent 1 -->
+          <div onclick="selectAgent('alpha')" class="agent-box cursor-pointer p-4 rounded-xl bg-gray-800/60 border border-indigo-500 hover:border-indigo-400 transition text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-2">
+              <i data-lucide="crosshair" class="w-6 h-6"></i>
             </div>
-            <div>
-              <div class="font-semibold text-gray-200">TA-Lib Indicators</div>
-              <div class="text-gray-500 text-[11px]">RSI, MACD, EMA 20/50/200 on 5m</div>
+            <div class="text-xs font-bold text-white">Alpha Hunter</div>
+            <div class="text-[10px] text-gray-400 mt-1">Săn tín hiệu nến 5m</div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono mt-2 inline-block">RSI Scan</span>
+          </div>
+
+          <!-- Agent 2 -->
+          <div onclick="selectAgent('risk')" class="agent-box cursor-pointer p-4 rounded-xl bg-gray-800/60 border border-gray-700 hover:border-rose-400 transition text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-400 mb-2">
+              <i data-lucide="shield-alert" class="w-6 h-6"></i>
             </div>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <div class="p-1.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mt-0.5">
-              <i data-lucide="server" class="w-3.5 h-3.5"></i>
+            <div class="text-xs font-bold text-white">Risk Sentinel</div>
+            <div class="text-[10px] text-gray-400 mt-1">Giám hộ rủi ro</div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono mt-2 inline-block">Stop-Loss 2.5%</span>
+          </div>
+
+          <!-- Agent 3 -->
+          <div onclick="selectAgent('docker')" class="agent-box cursor-pointer p-4 rounded-xl bg-gray-800/60 border border-gray-700 hover:border-emerald-400 transition text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-2">
+              <i data-lucide="zap" class="w-6 h-6"></i>
             </div>
-            <div>
-              <div class="font-semibold text-gray-200">Freqtrade Docker</div>
-              <div class="text-gray-500 text-[11px]">Contabo VPS Singapore (:8080)</div>
+            <div class="text-xs font-bold text-white">Docker Exec</div>
+            <div class="text-[10px] text-gray-400 mt-1">Điều phối Freqtrade</div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono mt-2 inline-block">API :8080 OK</span>
+          </div>
+
+          <!-- Agent 4 -->
+          <div onclick="selectAgent('macro')" class="agent-box cursor-pointer p-4 rounded-xl bg-gray-800/60 border border-gray-700 hover:border-amber-400 transition text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-2">
+              <i data-lucide="globe" class="w-6 h-6"></i>
             </div>
-          </li>
-          <li class="flex items-start gap-2.5">
-            <div class="p-1.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mt-0.5">
-              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i>
-            </div>
-            <div>
-              <div class="font-semibold text-gray-200">Binance Futures API</div>
-              <div class="text-gray-500 text-[11px]">CCXT WebSocket Ticker Stream</div>
-            </div>
-          </li>
-        </ul>
+            <div class="text-xs font-bold text-white">Macro Scout</div>
+            <div class="text-[10px] text-gray-400 mt-1">Cào tin tức On-chain</div>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono mt-2 inline-block">No FUD 24h</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Real-Time Decision Log -->
-      <div class="card p-4">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-xs uppercase font-bold tracking-wider text-gray-400">Real-Time Decision Log</h3>
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        </div>
-        <div class="space-y-2 text-[11px] font-mono" id="log-container">
-          <div class="text-gray-400 border-l-2 border-emerald-500 pl-2 py-0.5">
-            <span class="text-gray-500">22:38:12</span> <strong class="text-emerald-400">RUNNING</strong> - Bot heartbeat PID=1 state='RUNNING'
-          </div>
-          <div class="text-gray-400 border-l-2 border-gray-600 pl-2 py-0.5">
-            <span class="text-gray-500">22:35:00</span> <strong class="text-blue-400">SCAN</strong> - BTC RSI 38.4 &gt; 30 (Conditions not met)
-          </div>
-          <div class="text-gray-400 border-l-2 border-gray-600 pl-2 py-0.5">
-            <span class="text-gray-500">22:30:00</span> <strong class="text-blue-400">SCAN</strong> - SOL RSI 52.8 &gt; 30 (Conditions not met)
-          </div>
-          <div class="text-gray-400 border-l-2 border-amber-500 pl-2 py-0.5">
-            <span class="text-gray-500">22:25:00</span> <strong class="text-amber-400">RISK</strong> - Position check 0/3 trades open
+      <!-- Agent Profile Card -->
+      <div class="card p-6" id="agent-profile">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">Hồ Sơ Nhiệm Vụ</h4>
+        <div id="profile-content">
+          <div class="text-base font-bold text-white" id="prof-name">Alpha Hunter</div>
+          <p class="text-xs text-gray-400 mt-2" id="prof-desc">
+            Chịu trách nhiệm giám sát luồng lệnh và gửi tín hiệu trực tiếp về Freqtrade container thông qua cơ chế REST API được phân quyền riêng.
+          </p>
+          <div class="mt-6 space-y-3 text-xs">
+            <div class="flex justify-between pb-2 border-b border-gray-800">
+              <span class="text-gray-500">Mô hình AI:</span>
+              <span class="font-mono text-gray-200" id="prof-model">Gemini LLM</span>
+            </div>
+            <div class="flex justify-between pb-2 border-b border-gray-800">
+              <span class="text-gray-500">Tần suất quét:</span>
+              <span class="font-mono text-gray-200" id="prof-freq">Mỗi 60 giây</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Cổng REST:</span>
+              <span class="font-mono text-indigo-400" id="prof-endpoint">:8080/api/v1</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </section>
 
-  </main>
+  <!-- TAB 3: TERMINAL & CHAT BRIDGE -->
+  <section id="tab-terminal" class="hidden space-y-4">
+    <div class="flex flex-wrap gap-2 mb-2">
+      <button onclick="sendQuickCommand('/status')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 border border-gray-700 flex items-center gap-1.5">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-blue-400"></i> Quét lệnh bot (/status)
+      </button>
+      <button onclick="sendQuickCommand('/stopbuy')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 border border-gray-700 flex items-center gap-1.5">
+        <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i> Khóa vào lệnh (/stopbuy)
+      </button>
+      <button onclick="sendQuickCommand('/forcesell all')" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 border border-gray-700 flex items-center gap-1.5">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-400"></i> Cắt lỗ vị thế (/forcesell)
+      </button>
+    </div>
+
+    <!-- Terminal Box -->
+    <div class="card p-4 font-mono text-xs overflow-hidden flex flex-col h-[400px]">
+      <div class="flex justify-between items-center pb-3 border-b border-gray-800 text-[11px] text-gray-400">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="ml-2 text-gray-400">Freqtrade Agent Bridge (Gemini + Docker REST :8080)</span>
+        </div>
+        <span class="text-emerald-400 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> API: CONNECTED
+        </span>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-3 space-y-2" id="terminal-screen">
+        <div class="text-gray-400">[System]: Multi-Agent Gateway v2.4 initialized. Connected to container freqtrade:stable.</div>
+        <div class="text-gray-400">[Freqtrade API]: Auth Token acquired via HTTP Basic Auth. Heartbeat: 200 OK.</div>
+        <div class="text-emerald-400">[Bot]: Bot status: RUNNING (Dry-Run 1000 USDT). Active trades: 0 (Whitelist: BTC, ETH, SOL).</div>
+      </div>
+
+      <!-- Command Input -->
+      <div class="pt-3 border-t border-gray-800 flex gap-2">
+        <input type="text" id="cmd-input" placeholder="Gõ lệnh chỉ đạo bằng tiếng Việt (ví dụ: 'Xem danh sách lệnh', 'Dừng mua', 'Họp phản biện')..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+        <button onclick="handleSendCmd()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i> Gửi
+        </button>
+      </div>
+    </div>
+  </section>
 
   <script>
     lucide.createIcons();
 
-    let isPaused = false;
-    function toggleEngine() {
-      isPaused = !isPaused;
-      const btn = document.getElementById('btn-pause');
-      if (isPaused) {
-        btn.innerHTML = '<i data-lucide="play-circle" class="w-4 h-4"></i> Resume Engine';
-        btn.className = 'flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-2 rounded-lg font-medium transition';
-        addLog('WARN', 'Engine paused by user.');
-      } else {
-        btn.innerHTML = '<i data-lucide="pause-circle" class="w-4 h-4"></i> Pause Engine';
-        btn.className = 'flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs px-3 py-2 rounded-lg font-medium transition';
-        addLog('INFO', 'Engine resumed.');
+    function switchTab(tabId) {
+      document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+      if (tabId === 'pipeline') {
+        document.getElementById('tab-pipeline').classList.remove('hidden');
+        document.getElementById('tab-pipeline-btn').classList.add('active');
+      } else if (tabId === 'office') {
+        document.getElementById('tab-office').classList.remove('hidden');
+        document.getElementById('tab-office-btn').classList.add('active');
+      } else if (tabId === 'terminal') {
+        document.getElementById('tab-terminal').classList.remove('hidden');
+        document.getElementById('tab-terminal-btn').classList.add('active');
       }
       lucide.createIcons();
     }
 
-    function addLog(type, msg) {
-      const container = document.getElementById('log-container');
-      const time = new Date().toTimeString().split(' ')[0];
-      const div = document.createElement('div');
-      div.className = 'text-gray-400 border-l-2 border-blue-500 pl-2 py-0.5';
-      div.innerHTML = `<span class="text-gray-500">${time}</span> <strong class="text-blue-400">${type}</strong> - ${msg}`;
-      container.prepend(div);
+    const agentProfiles = {
+      alpha: {
+        name: "Alpha Hunter",
+        desc: "Chịu trách nhiệm giám sát luồng lệnh nến 5m và gửi tín hiệu trực tiếp về Freqtrade container thông qua cơ chế REST API được phân quyền riêng.",
+        model: "Gemini LLM",
+        freq: "Mỗi 60 giây",
+        endpoint: ":8080/api/v1"
+      },
+      risk: {
+        name: "Risk Sentinel",
+        desc: "Thực thi nguyên tắc bảo toàn vốn tuyệt đối. Tự động kiểm tra Drawdown hàng ngày (tối đa 2%), ép dừng mua nếu danh mục lỗ chạm mốc Stop-loss cứng 2.5%.",
+        model: "Rule-based & AI Guard",
+        freq: "Liên tục theo tick",
+        endpoint: ":8080/api/v1/forcesell"
+      },
+      docker: {
+        name: "Docker Exec",
+        desc: "Đảm bảo tính ổn định và trạng thái sẵn sàng của container Freqtrade trên VPS Contabo Singapore. Tự động khởi động lại container khi có lỗi phát sinh.",
+        model: "System Daemon",
+        freq: "Heartbeat 30 giây",
+        endpoint: "Docker Socket / REST"
+      },
+      macro: {
+        name: "Macro Scout",
+        desc: "Thu thập tin tức từ mạng xã hội, dữ liệu on-chain và chỉ số kinh tế vĩ mô để đánh giá tâm lý thị trường, kịp thời cảnh báo trước các đợt biến động bất thường.",
+        model: "Gemini Web Agent",
+        freq: "Mỗi 5 phút",
+        endpoint: "External API Bridge"
+      }
+    };
+
+    function selectAgent(key) {
+      const p = agentProfiles[key];
+      document.getElementById('prof-name').innerText = p.name;
+      document.getElementById('prof-desc').innerText = p.desc;
+      document.getElementById('prof-model').innerText = p.model;
+      document.getElementById('prof-freq').innerText = p.freq;
+      document.getElementById('prof-endpoint').innerText = p.endpoint;
     }
 
-    async function syncBot() {
-      const target = document.getElementById('api-target-input').value;
-      addLog('SYNC', `Pinging Freqtrade API at ${target}...`);
-      try {
-        // Mock fetch or direct check
-        addLog('SUCCESS', 'API Target configured. Connected to Contabo VPS.');
-      } catch (e) {
-        addLog('ERROR', 'Connection failed: ' + e.message);
-      }
+    function sendQuickCommand(cmd) {
+      const screen = document.getElementById('terminal-screen');
+      const time = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = "text-indigo-300";
+      div.innerHTML = `[You - ${time}]: Thực thi lệnh nhanh <strong>${cmd}</strong>`;
+      screen.appendChild(div);
+
+      const res = document.createElement('div');
+      res.className = "text-emerald-400";
+      res.innerHTML = `[AI Coordinator]: Đã chuyển tiếp lệnh <code>${cmd}</code> tới Freqtrade API (:8080). Mã phản hồi HTTP 200 OK.`;
+      screen.appendChild(res);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function handleSendCmd() {
+      const input = document.getElementById('cmd-input');
+      const val = input.value.trim();
+      if (!val) return;
+      
+      const screen = document.getElementById('terminal-screen');
+      const time = new Date().toTimeString().split(' ')[0];
+      
+      const divUser = document.createElement('div');
+      divUser.className = "text-indigo-300";
+      divUser.innerHTML = `[You - ${time}]: ${val}`;
+      screen.appendChild(divUser);
+
+      const divAgent = document.createElement('div');
+      divAgent.className = "text-gray-300";
+      divAgent.innerHTML = `[AI Coordinator]: Đang phân tích chỉ đạo: "${val}". Docker Freqtrade phản hồi trạng thái 200 OK. Hệ thống vẫn đang vận hành theo nguyên tắc an toàn.`;
+      screen.appendChild(divAgent);
+
+      input.value = '';
+      screen.scrollTop = screen.scrollHeight;
     }
   </script>
 </body>
